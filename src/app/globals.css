@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #FAF7F2;
+    --foreground: #22170F;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom scrollbars for category pills and lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Print Styles for Digital Bill / Receipt */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide navigation, buttons, footers, headers during print */
+  nav,
+  header,
+  footer,
+  .no-print,
+  button,
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Make receipt full width and clean */
+  .receipt-container {
+    box-shadow: none !important;
+    border: 1px dashed #777 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1.5rem !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
