@@ -1,15 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, Suspense } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useTransition, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  MapPin,
-  UtensilsCrossed,
-  Info,
-  Phone,
-  Edit2,
-  Sparkles,
-} from "lucide-react";
+import { Edit2, UtensilsCrossed } from "lucide-react";
 import { MENU_ITEMS } from "@/data/menu";
 import { MenuItem, MenuCategoryType } from "@/types/menu";
 import { useCustomerStore } from "@/store/customer-store";
@@ -24,7 +17,11 @@ function MenuContent() {
   const searchParams = useSearchParams();
   const tableParam = searchParams.get("table");
 
-  const { tableId, setTableId, mobile, name } = useCustomerStore();
+  // Granular selectors so MenuContent only re-renders when relevant customer info changes
+  const tableId = useCustomerStore((s) => s.tableId);
+  const setTableId = useCustomerStore((s) => s.setTableId);
+  const mobile = useCustomerStore((s) => s.mobile);
+  const name = useCustomerStore((s) => s.name);
 
   const [selectedCategory, setSelectedCategory] = useState<MenuCategoryType>("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,6 +30,9 @@ function MenuContent() {
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
+  // useTransition ensures user input / click events are handled immediately without blocking paint
+  const [, startTransition] = useTransition();
+
   // Sync table from URL if present
   useEffect(() => {
     if (tableParam) {
@@ -40,9 +40,9 @@ function MenuContent() {
     }
   }, [tableParam, setTableId]);
 
-  const activeTableInfo = getTableById(tableId);
+  const activeTableInfo = useMemo(() => getTableById(tableId), [tableId]);
 
-  // Compute category item counts
+  // Compute category item counts (static constant)
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { All: MENU_ITEMS.length };
     for (const item of MENU_ITEMS) {
@@ -53,6 +53,7 @@ function MenuContent() {
 
   // Filtered menu items
   const filteredItems = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
     return MENU_ITEMS.filter((item) => {
       // Category filter
       if (selectedCategory !== "All" && item.category !== selectedCategory) {
@@ -67,8 +68,7 @@ function MenuContent() {
         return false;
       }
       // Search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
+      if (query) {
         const matchesName = item.name.toLowerCase().includes(query);
         const matchesDesc = item.description.toLowerCase().includes(query);
         const matchesCategory = item.category.toLowerCase().includes(query);
@@ -80,6 +80,38 @@ function MenuContent() {
       return true;
     });
   }, [selectedCategory, vegOnly, bestsellerOnly, searchQuery]);
+
+  const handleSelectCategory = useCallback((category: MenuCategoryType) => {
+    startTransition(() => {
+      setSelectedCategory(category);
+    });
+  }, []);
+
+  const handleSearchChange = useCallback((query: string) => {
+    startTransition(() => {
+      setSearchQuery(query);
+    });
+  }, []);
+
+  const handleToggleVegOnly = useCallback(() => {
+    startTransition(() => {
+      setVegOnly((v) => !v);
+    });
+  }, []);
+
+  const handleToggleBestsellerOnly = useCallback(() => {
+    startTransition(() => {
+      setBestsellerOnly((b) => !b);
+    });
+  }, []);
+
+  const handleSelectItem = useCallback((item: MenuItem) => {
+    setActiveItem(item);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setActiveItem(null);
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
@@ -124,18 +156,18 @@ function MenuContent() {
       {/* Search & Quick Filters */}
       <SearchBar
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
         vegOnly={vegOnly}
-        onToggleVegOnly={() => setVegOnly((v) => !v)}
+        onToggleVegOnly={handleToggleVegOnly}
         bestsellerOnly={bestsellerOnly}
-        onToggleBestsellerOnly={() => setBestsellerOnly((b) => !b)}
+        onToggleBestsellerOnly={handleToggleBestsellerOnly}
         resultCount={filteredItems.length}
       />
 
       {/* Sticky Category Tabs */}
       <CategoryTabs
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={handleSelectCategory}
         categoryCounts={categoryCounts}
       />
 
@@ -143,7 +175,7 @@ function MenuContent() {
       {filteredItems.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5 pt-1">
           {filteredItems.map((item) => (
-            <MenuCard key={item.id} item={item} onSelect={setActiveItem} />
+            <MenuCard key={item.id} item={item} onSelect={handleSelectItem} />
           ))}
         </div>
       ) : (
@@ -168,7 +200,7 @@ function MenuContent() {
       )}
 
       {/* Item Detail Modal */}
-      <MenuItemModal item={activeItem} onClose={() => setActiveItem(null)} />
+      <MenuItemModal item={activeItem} onClose={handleCloseModal} />
 
       {/* Customer Info Modal */}
       <CustomerDetailsModal

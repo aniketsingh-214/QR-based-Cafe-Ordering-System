@@ -6,9 +6,11 @@ import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { formatCurrency } from "@/lib/utils";
 
-export default function BottomCartBar() {
+function BottomCartBarComponent() {
   const router = useRouter();
   const pathname = usePathname();
+
+  // Granular selectors so BottomCartBar only updates when itemCount or grandTotal actually changes
   const itemCount = useCartStore((s) => s.getItemCount());
   const grandTotal = useCartStore((s) => s.getGrandTotal());
 
@@ -49,3 +51,5 @@ export default function BottomCartBar() {
     </aside>
   );
 }
+
+export default React.memo(BottomCartBarComponent);

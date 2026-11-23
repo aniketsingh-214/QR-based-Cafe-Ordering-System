@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Coffee, ShoppingBag, X, Check, UtensilsCrossed } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
@@ -9,18 +9,20 @@ import { CAFE_TABLES } from "@/data/tables";
 
 export default function Header() {
   const router = useRouter();
+  // Granular selectors so Header only re-renders when itemCount or tableId changes
   const itemCount = useCartStore((s) => s.getItemCount());
-  const { tableId, setTableId } = useCustomerStore();
+  const tableId = useCustomerStore((s) => s.tableId);
+  const setTableId = useCustomerStore((s) => s.setTableId);
 
   const [isTableOpen, setIsTableOpen] = useState(false);
   const [tempTable, setTempTable] = useState(tableId || "");
   const [savedNotice, setSavedNotice] = useState(false);
 
-  const handleOpenTable = () => {
+  const handleOpenTable = useCallback(() => {
     setTempTable(tableId || "");
     setSavedNotice(false);
     setIsTableOpen(true);
-  };
+  }, [tableId]);
 
   const handleSaveTable = (e: React.FormEvent) => {
     e.preventDefault();

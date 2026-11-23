@@ -13,7 +13,7 @@ interface SearchBarProps {
   resultCount: number;
 }
 
-export default function SearchBar({
+function SearchBarComponent({
   searchQuery,
   onSearchChange,
   vegOnly,
@@ -82,3 +82,5 @@ export default function SearchBar({
     </div>
   );
 }
+
+export default React.memo(SearchBarComponent);

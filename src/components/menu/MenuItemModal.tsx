@@ -12,32 +12,34 @@ interface MenuItemModalProps {
   onClose: () => void;
 }
 
-export default function MenuItemModal({ item, onClose }: MenuItemModalProps) {
-  const { addItem, items, updateQuantity } = useCartStore();
+function MenuItemModalComponent({ item, onClose }: MenuItemModalProps) {
+  const addItem = useCartStore((s) => s.addItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const existingItem = useCartStore((s) =>
+    item ? s.items.find((i) => i.item.id === item.id) : undefined
+  );
+
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (item) {
-      const existing = items.find((i) => i.item.id === item.id);
-      if (existing) {
-        setQuantity(existing.quantity);
-        setNotes(existing.notes || "");
+      if (existingItem) {
+        setQuantity(existingItem.quantity);
+        setNotes(existingItem.notes || "");
       } else {
         setQuantity(1);
         setNotes("");
       }
     }
-  }, [item, items]);
+  }, [item, existingItem]);
 
   if (!item) return null;
 
   const handleSave = () => {
-    const existing = items.find((i) => i.item.id === item.id);
-    if (existing) {
+    if (existingItem) {
       updateQuantity(item.id, quantity);
-      // Update notes if necessary by re-adding or updating
-      existing.notes = notes.trim() || undefined;
+      existingItem.notes = notes.trim() || undefined;
     } else {
       for (let i = 0; i < quantity; i++) {
         addItem(item, notes.trim() || undefined);
@@ -163,3 +165,5 @@ export default function MenuItemModal({ item, onClose }: MenuItemModalProps) {
     </div>
   );
 }
+
+export default React.memo(MenuItemModalComponent);

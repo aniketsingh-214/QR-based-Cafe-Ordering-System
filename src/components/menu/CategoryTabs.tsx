@@ -20,7 +20,13 @@ interface CategoryTabsProps {
   categoryCounts: Record<string, number>;
 }
 
-export default function CategoryTabs({
+// Static definition so array reference is never recreated on render
+const TABS: { id: MenuCategoryType; label: string }[] = [
+  { id: "All", label: "All Items" },
+  ...CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
+];
+
+function CategoryTabsComponent({
   selectedCategory,
   onSelectCategory,
   categoryCounts,
@@ -46,15 +52,10 @@ export default function CategoryTabs({
     }
   };
 
-  const tabs: { id: MenuCategoryType; label: string }[] = [
-    { id: "All", label: "All Items" },
-    ...CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
-  ];
-
   return (
     <div className="sticky top-16 z-30 bg-cafe-50/95 backdrop-blur-md py-2.5 border-b border-cafe-200/80 -mx-4 px-4 overflow-x-auto no-scrollbar">
       <div className="flex items-center gap-2 max-w-4xl mx-auto">
-        {tabs.map((tab) => {
+        {TABS.map((tab) => {
           const isSelected = selectedCategory === tab.id;
           const count = categoryCounts[tab.id] || 0;
 
@@ -86,3 +87,5 @@ export default function CategoryTabs({
     </div>
   );
 }
+
+export default React.memo(CategoryTabsComponent);

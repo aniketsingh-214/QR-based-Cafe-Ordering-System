@@ -12,9 +12,17 @@ interface MenuCardProps {
   onSelect: (item: MenuItem) => void;
 }
 
-export default function MenuCard({ item, onSelect }: MenuCardProps) {
-  const { getItemQuantity, addItem, updateQuantity } = useCartStore();
-  const quantity = getItemQuantity(item.id);
+function MenuCardComponent({ item, onSelect }: MenuCardProps) {
+  // Use granular selectors so ONLY this specific card re-renders when its quantity changes
+  const quantity = useCartStore(
+    (s) => s.items.find((ci) => ci.item.id === item.id)?.quantity || 0
+  );
+  const addItem = useCartStore((s) => s.addItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+
+  const handleCardClick = () => {
+    onSelect(item);
+  };
 
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -33,7 +41,7 @@ export default function MenuCard({ item, onSelect }: MenuCardProps) {
 
   return (
     <div
-      onClick={() => onSelect(item)}
+      onClick={handleCardClick}
       className="bg-white rounded-2xl p-3.5 border border-cafe-200/90 shadow-soft hover:shadow-elevated transition-all duration-200 flex flex-col justify-between cursor-pointer group active:scale-[0.99]"
     >
       <div>
@@ -127,3 +135,5 @@ export default function MenuCard({ item, onSelect }: MenuCardProps) {
     </div>
   );
 }
+
+export default React.memo(MenuCardComponent);
