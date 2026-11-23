@@ -1,41 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/navigation";
-import { usePathname, useRouter } from "next/navigation";
-import { Coffee, ShoppingBag, QrCode, Settings, X, Check, UtensilsCrossed } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Coffee, ShoppingBag, X, Check, UtensilsCrossed } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { useCustomerStore } from "@/store/customer-store";
-import { DEFAULT_CAFE_CONFIG } from "@/data/config";
 import { CAFE_TABLES } from "@/data/tables";
 
 export default function Header() {
-  const pathname = usePathname();
   const router = useRouter();
   const itemCount = useCartStore((s) => s.getItemCount());
-  const { tableId, setTableId, customOwnerWhatsApp, setCustomOwnerWhatsApp } = useCustomerStore();
+  const { tableId, setTableId } = useCustomerStore();
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [tempPhone, setTempPhone] = useState(customOwnerWhatsApp || DEFAULT_CAFE_CONFIG.ownerWhatsAppNumber);
-  const [tempTable, setTempTable] = useState(tableId || "T01");
+  const [isTableOpen, setIsTableOpen] = useState(false);
+  const [tempTable, setTempTable] = useState(tableId || "");
   const [savedNotice, setSavedNotice] = useState(false);
 
-  const handleOpenSettings = () => {
-    setTempPhone(customOwnerWhatsApp || DEFAULT_CAFE_CONFIG.ownerWhatsAppNumber);
-    setTempTable(tableId || "T01");
+  const handleOpenTable = () => {
+    setTempTable(tableId || "");
     setSavedNotice(false);
-    setIsSettingsOpen(true);
+    setIsTableOpen(true);
   };
 
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveTable = (e: React.FormEvent) => {
     e.preventDefault();
-    setCustomOwnerWhatsApp(tempPhone.trim());
     if (tempTable) {
       setTableId(tempTable);
     }
     setSavedNotice(true);
     setTimeout(() => {
-      setIsSettingsOpen(false);
+      setIsTableOpen(false);
       setSavedNotice(false);
     }, 800);
   };
@@ -63,12 +57,11 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Right Actions: Table Pill, QR Manager, Settings, Cart */}
+          {/* Right Actions: Table Pill, Cart (no owner/staff controls on the customer site) */}
           <div className="flex items-center gap-2">
-            {/* Table Badge */}
             {tableId ? (
               <button
-                onClick={handleOpenSettings}
+                onClick={handleOpenTable}
                 title="Change Table"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-cafe-100 text-cafe-900 text-xs font-semibold border border-cafe-300/80 hover:bg-cafe-200 transition-colors"
               >
@@ -77,35 +70,13 @@ export default function Header() {
               </button>
             ) : (
               <button
-                onClick={handleOpenSettings}
+                onClick={handleOpenTable}
                 className="text-xs px-2.5 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 transition-colors font-medium flex items-center gap-1"
               >
                 <UtensilsCrossed className="w-3.5 h-3.5 text-amber-700" />
                 <span>Select Table</span>
               </button>
             )}
-
-            {/* QR Table Generator Tool */}
-            <button
-              onClick={() => router.push("/qr-codes")}
-              title="Table QR Codes"
-              className={`p-2 rounded-xl transition-colors ${
-                pathname === "/qr-codes"
-                  ? "bg-cafe-800 text-white"
-                  : "text-cafe-700 hover:bg-cafe-100"
-              }`}
-            >
-              <QrCode className="w-5 h-5" />
-            </button>
-
-            {/* Settings Button */}
-            <button
-              onClick={handleOpenSettings}
-              title="Settings & WhatsApp Number"
-              className="p-2 text-cafe-700 hover:bg-cafe-100 rounded-xl transition-colors"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
 
             {/* Cart Button */}
             <button
@@ -124,33 +95,34 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Settings / Config Modal */}
-      {isSettingsOpen && (
+      {/* Table picker modal */}
+      {isTableOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-elevated border border-cafe-200">
             <div className="flex items-center justify-between pb-3 border-b border-cafe-100">
-              <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-cafe-800" />
-                <h2 className="font-bold text-cafe-950 text-base">Cafe & Table Settings</h2>
-              </div>
+              <h2 className="font-bold text-cafe-950 text-base">Your Table</h2>
               <button
-                onClick={() => setIsSettingsOpen(false)}
+                onClick={() => setIsTableOpen(false)}
                 className="p-1 rounded-lg text-cafe-500 hover:text-cafe-900 hover:bg-cafe-100"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveSettings} className="mt-4 space-y-4">
+            <form onSubmit={handleSaveTable} className="mt-4 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-cafe-800 uppercase tracking-wider mb-1">
-                  Active Dining Table
+                  Dining Table
                 </label>
                 <select
                   value={tempTable}
                   onChange={(e) => setTempTable(e.target.value)}
+                  required
                   className="w-full px-3 py-2 border border-cafe-300 rounded-xl text-cafe-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-cafe-600 bg-cafe-50/50"
                 >
+                  <option value="" disabled>
+                    Select your table
+                  </option>
                   {CAFE_TABLES.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.id} — {t.name} ({t.zone})
@@ -158,40 +130,21 @@ export default function Header() {
                   ))}
                 </select>
                 <p className="text-[11px] text-cafe-500 mt-1">
-                  Simulates scanning a specific table&apos;s QR code.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-cafe-800 uppercase tracking-wider mb-1">
-                  Cafe Owner WhatsApp Number
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    value={tempPhone}
-                    onChange={(e) => setTempPhone(e.target.value)}
-                    placeholder="919876543210 (Country code + 10 digits)"
-                    className="w-full px-3 py-2 border border-cafe-300 rounded-xl text-cafe-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-cafe-600"
-                    required
-                  />
-                </div>
-                <p className="text-[11px] text-cafe-500 mt-1">
-                  Orders placed will trigger WhatsApp click-to-chat directed to this phone number.
+                  Scan the QR code on your table, or pick your table here.
                 </p>
               </div>
 
               {savedNotice && (
                 <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-semibold flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600" />
-                  Settings updated successfully!
+                  Table updated!
                 </div>
               )}
 
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsSettingsOpen(false)}
+                  onClick={() => setIsTableOpen(false)}
                   className="flex-1 py-2.5 rounded-xl border border-cafe-300 text-cafe-700 text-sm font-semibold hover:bg-cafe-100"
                 >
                   Cancel
@@ -200,7 +153,7 @@ export default function Header() {
                   type="submit"
                   className="flex-1 py-2.5 rounded-xl bg-cafe-900 hover:bg-cafe-800 text-white text-sm font-semibold shadow-xs"
                 >
-                  Save Settings
+                  Save Table
                 </button>
               </div>
             </form>

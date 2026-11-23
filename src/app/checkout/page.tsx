@@ -20,7 +20,7 @@ import { useCustomerStore } from "@/store/customer-store";
 import { formatCurrency } from "@/lib/utils";
 import { getTableById } from "@/data/tables";
 import { buildOrder } from "@/lib/order-generator";
-import { DEFAULT_CAFE_CONFIG } from "@/data/config";
+import { normalizeIndianMobile } from "@/lib/whatsapp";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function CheckoutPage() {
 
   const [formName, setFormName] = useState(name);
   const [formMobile, setFormMobile] = useState(mobile);
-  const [formTable, setFormTable] = useState(tableId || "T01");
+  const [formTable, setFormTable] = useState(tableId || "");
   const [formNotes, setFormNotes] = useState(notes);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,15 +41,6 @@ export default function CheckoutPage() {
   const grandTotal = getGrandTotal();
   const activeTableInfo = getTableById(formTable);
 
-  // Validate Indian mobile number
-  const validatePhone = (number: string): boolean => {
-    const cleaned = number.replace(/\D/g, "");
-    if (cleaned.length === 12 && cleaned.startsWith("91")) {
-      return /^[6-9]\d{9}$/.test(cleaned.slice(2));
-    }
-    return /^[6-9]\d{9}$/.test(cleaned);
-  };
-
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -58,13 +49,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    const cleanedPhone = formMobile.replace(/\D/g, "");
-    const actual10Digits =
-      cleanedPhone.length === 12 && cleanedPhone.startsWith("91")
-        ? cleanedPhone.slice(2)
-        : cleanedPhone;
-
-    if (!validatePhone(actual10Digits)) {
+    const actual10Digits = normalizeIndianMobile(formMobile);
+    if (!actual10Digits) {
       setError("Please enter a valid 10-digit Indian mobile number (e.g. 9876543210).");
       return;
     }

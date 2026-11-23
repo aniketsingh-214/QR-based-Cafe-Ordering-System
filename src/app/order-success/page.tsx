@@ -11,8 +11,6 @@ import {
   ArrowRight,
   UtensilsCrossed,
   Sparkles,
-  PhoneCall,
-  Clock,
   Eye,
   ChevronDown,
   ChevronUp,
@@ -20,11 +18,11 @@ import {
 import { useCartStore } from "@/store/cart-store";
 import { useCustomerStore } from "@/store/customer-store";
 import { Order } from "@/types/order";
-import { DEFAULT_CAFE_CONFIG } from "@/data/config";
 import {
   generateOwnerOrderMessage,
-  generateCustomerBillShareMessage,
-  openWhatsApp,
+  getOwnerOrderUrl,
+  getCustomerBillUrl,
+  OWNER_WHATSAPP,
 } from "@/lib/whatsapp";
 import { printBill } from "@/lib/bill-generator";
 import DigitalReceipt from "@/components/receipt/DigitalReceipt";
@@ -32,7 +30,7 @@ import DigitalReceipt from "@/components/receipt/DigitalReceipt";
 export default function OrderSuccessPage() {
   const router = useRouter();
   const { lastOrder, orderHistory } = useCartStore();
-  const { customOwnerWhatsApp, tableId } = useCustomerStore();
+  const { tableId } = useCustomerStore();
 
   const [showMessagePreview, setShowMessagePreview] = useState(false);
 
@@ -71,21 +69,11 @@ export default function OrderSuccessPage() {
     );
   }
 
-  const targetOwnerPhone = customOwnerWhatsApp || DEFAULT_CAFE_CONFIG.ownerWhatsAppNumber;
+  // Owner number is a fixed constant (never customer-editable). Plain <a href> links are used instead of
+  // window.open() so iOS Safari / in-app browsers (Google Lens, Instagram) cannot block the popup.
   const ownerMessage = generateOwnerOrderMessage(order);
-  const customerShareMessage = generateCustomerBillShareMessage(order, DEFAULT_CAFE_CONFIG.cafeName);
-
-  const handleNotifyOwner = () => {
-    openWhatsApp(targetOwnerPhone, ownerMessage);
-  };
-
-  const handleShareWithFriend = () => {
-    // Open WhatsApp to share with any contact or group
-    const encoded = encodeURIComponent(customerShareMessage);
-    if (typeof window !== "undefined") {
-      window.open(`https://api.whatsapp.com/send?text=${encoded}`, "_blank");
-    }
-  };
+  const ownerUrl = getOwnerOrderUrl(order);
+  const customerBillUrl = getCustomerBillUrl(order);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
@@ -116,19 +104,22 @@ export default function OrderSuccessPage() {
           </div>
 
           <p className="text-xs text-emerald-50 max-w-md mx-auto leading-relaxed">
-            Click below to open WhatsApp with your pre-filled order details ready for the cafe owner/barista.
+            <strong>Your order is not received by the kitchen until you tap Send in WhatsApp.</strong>{" "}
+            Tap the button, then press the green send arrow in WhatsApp.
           </p>
 
-          <button
-            onClick={handleNotifyOwner}
+          <a
+            href={ownerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full py-3.5 px-4 rounded-xl bg-white text-emerald-950 font-black text-sm sm:text-base hover:bg-emerald-50 shadow-md flex items-center justify-center gap-2 active:scale-[0.99] transition-transform"
           >
             <MessageCircle className="w-5 h-5 text-emerald-600 fill-emerald-600" />
-            <span>Send Order via WhatsApp</span>
-          </button>
+            <span>Send Order to Kitchen on WhatsApp</span>
+          </a>
 
           <p className="text-[11px] text-emerald-200/90">
-            Recipient: +{targetOwnerPhone}
+            Kitchen number: +{OWNER_WHATSAPP}
           </p>
         </div>
 
@@ -158,13 +149,15 @@ export default function OrderSuccessPage() {
       {/* Sharing & Printing Action Buttons */}
       <div className="grid grid-cols-2 gap-3 no-print">
         {/* Share Bill on WhatsApp */}
-        <button
-          onClick={handleShareWithFriend}
+        <a
+          href={customerBillUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="p-3.5 bg-white hover:bg-cafe-50 rounded-2xl border border-cafe-300 font-bold text-xs sm:text-sm text-cafe-900 shadow-2xs flex items-center justify-center gap-2 transition-colors active:scale-95"
         >
           <Share2 className="w-4 h-4 text-emerald-600" />
-          <span>Share Bill on WhatsApp</span>
-        </button>
+          <span>Send Bill to My WhatsApp</span>
+        </a>
 
         {/* Print / Save PDF Bill */}
         <button

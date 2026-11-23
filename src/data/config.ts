@@ -6,8 +6,8 @@ export const DEFAULT_CAFE_CONFIG: CafeConfig = {
   address: "Shop 14, High Street Avenue, Indiranagar, Bengaluru - 560038",
   gstNumber: "29AAAAA0000A1Z5",
   fssaiNumber: "11223344556677",
-  ownerWhatsAppNumber: "919876543210", // 10-digit Indian number prefixed with 91 (configurable)
+  ownerWhatsAppNumber: "919079629797", // Single source of truth: the ONLY number that receives kitchen orders (91 + 10 digits)
   taxPercent: 5, // 5% GST (2.5% CGST + 2.5% SGST)
   currencySymbol: "₹",
-  supportPhone: "+91 98765 43210",
+  supportPhone: "+91 90796 29797",
 };

@@ -4,13 +4,11 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Coffee,
-  QrCode,
   ArrowRight,
   ShieldCheck,
   Phone,
   User,
   Sparkles,
-  ChevronRight,
   MapPin,
 } from "lucide-react";
 import { useCustomerStore } from "@/store/customer-store";
@@ -232,24 +230,6 @@ function LandingContent() {
             <ArrowRight className="w-4 h-4 text-amber-300 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
-      </div>
-
-      {/* Staff & Table Utility Link */}
-      <div className="p-4 rounded-2xl bg-cafe-100/80 border border-cafe-300/80 flex items-center justify-between text-xs text-cafe-800">
-        <div className="flex items-center gap-2.5">
-          <QrCode className="w-5 h-5 text-cafe-700" />
-          <div>
-            <p className="font-bold">Cafe Staff & QR Code Generator</p>
-            <p className="text-cafe-600 text-[11px]">Generate & print table tent cards</p>
-          </div>
-        </div>
-        <button
-          onClick={() => router.push("/qr-codes")}
-          className="px-3 py-1.5 rounded-xl bg-white border border-cafe-300 font-bold hover:bg-cafe-200 transition-colors flex items-center gap-1 text-cafe-900"
-        >
-          <span>View QRs</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
       </div>
     </div>
   );

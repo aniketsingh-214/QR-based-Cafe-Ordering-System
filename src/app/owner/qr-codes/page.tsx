@@ -16,7 +16,12 @@ import {
 } from "lucide-react";
 import { CAFE_TABLES } from "@/data/tables";
 import { DEFAULT_CAFE_CONFIG } from "@/data/config";
-import { generateTableQrDataUrl, getTableMenuUrl } from "@/lib/qr-generator";
+import {
+  generateTableQrDataUrl,
+  getTableMenuUrl,
+  getSiteOrigin,
+  isUnreachableOrigin,
+} from "@/lib/qr-generator";
 
 interface TableQrData {
   id: string;
@@ -127,6 +132,14 @@ export default function QrCodesPage() {
           <span>Print All Table Tent Cards</span>
         </button>
       </div>
+
+      {/* Owner-only module: warn if QR codes would encode an address customers cannot open */}
+      {isUnreachableOrigin(getSiteOrigin()) && (
+        <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold no-print">
+          Warning: QR codes currently point to {getSiteOrigin()}, which customers cannot open.
+          Set NEXT_PUBLIC_SITE_URL to your live website address before printing.
+        </div>
+      )}
 
       {/* Hero Information */}
       <div className="bg-white rounded-3xl p-6 border border-cafe-200/90 shadow-soft no-print space-y-2">

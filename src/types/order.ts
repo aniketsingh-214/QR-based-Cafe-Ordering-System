@@ -27,7 +27,7 @@ export interface CafeConfig {
   address: string;
   gstNumber?: string;
   fssaiNumber?: string;
-  ownerWhatsAppNumber: string; // international format without + or spaces e.g., '919876543210'
+  ownerWhatsAppNumber: string; // international format without + or spaces e.g., '919079629797'
   taxPercent: number; // e.g. 5
   currencySymbol: string;
   supportPhone: string;

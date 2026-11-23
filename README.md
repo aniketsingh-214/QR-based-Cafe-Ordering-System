@@ -46,7 +46,7 @@ A frontend-only, contactless QR-based cafe ordering web application built with *
 │   │   ├── cart/page.tsx       # Screen 05: Cart management & calculation
 │   │   ├── checkout/page.tsx   # Screen 06: Order review & placement
 │   │   ├── order-success/page.tsx # Screen 07 & 08: Digital bill & WhatsApp trigger
-│   │   ├── qr-codes/page.tsx   # Cafe Staff QR Code & Tent Card Print Center
+│   │   ├── owner/qr-codes/page.tsx   # Owner-only QR Code & Tent Card Print Center (Basic-Auth protected)
 │   │   ├── layout.tsx          # Root mobile-first layout with Header & Bottom Cart Bar
 │   │   └── globals.css         # Styling & print receipt rules
 │   ├── components/
@@ -88,7 +88,13 @@ A frontend-only, contactless QR-based cafe ordering web application built with *
 npm install
 ```
 
-### 2. Run the Development Server
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env.local` to enable the owner panel:
+```bash
+cp .env.example .env.local
+```
+
+### 3. Run the Development Server
 ```bash
 npm run dev
 ```
@@ -124,10 +130,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 5. **Place Order & WhatsApp Trigger**:
    - Proceed to Checkout and tap **Confirm & Place Order**.
    - Order ID is generated in format: `ORD-20261119-001`.
-   - Tap **Send Order via WhatsApp**: Opens WhatsApp with pre-filled kitchen order message.
-   - Tap **Share Bill on WhatsApp** to send receipt text to a companion.
+   - Tap **Send Order to Kitchen on WhatsApp**: Direct link opens WhatsApp to the kitchen number (`+919079629797`) with pre-filled order.
+   - Tap **Send Bill to My WhatsApp** to send receipt text to customer's own number.
    - Tap **Print / Save PDF** to trigger clean thermal receipt printing.
 
 6. **QR Code Generator & Table Stand Center**:
-   - Visit [http://localhost:3000/qr-codes](http://localhost:3000/qr-codes)
+   - Visit [http://localhost:3000/owner/qr-codes](http://localhost:3000/owner/qr-codes)
+   - Enter owner credentials from `.env.local` (`owner` / `change-me-to-a-long-random-password`).
    - View, download, or print table tent cards for all tables (T01 - T12) or create custom tables.

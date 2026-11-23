@@ -38,9 +38,11 @@ export const useCartStore = create<CartStoreState>()(
         const existingIndex = items.findIndex((i) => i.item.id === item.id);
 
         if (existingIndex > -1) {
-          const updated = [...items];
-          updated[existingIndex].quantity += 1;
-          if (notes) updated[existingIndex].notes = notes;
+          const updated = items.map((ci, idx) =>
+            idx === existingIndex
+              ? { ...ci, quantity: ci.quantity + 1, notes: notes || ci.notes }
+              : ci
+          );
           set({ items: updated });
         } else {
           set({ items: [...items, { item, quantity: 1, notes }] });
