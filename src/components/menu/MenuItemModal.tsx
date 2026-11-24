@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Image";
 import { X, Plus, Minus, Clock, Star, MessageSquare } from "lucide-react";
 import { MenuItem } from "@/types/menu";
 import { useCartStore } from "@/store/cart-store";

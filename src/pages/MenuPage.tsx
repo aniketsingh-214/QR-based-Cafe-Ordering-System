@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useState, useMemo, useEffect, useCallback, useTransition, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams } from "react-router-dom";
 import { Edit2, UtensilsCrossed } from "lucide-react";
 import { MENU_ITEMS } from "@/data/menu";
 import { MenuItem, MenuCategoryType } from "@/types/menu";
@@ -14,7 +12,7 @@ import SearchBar from "@/components/menu/SearchBar";
 import CustomerDetailsModal from "@/components/customer/CustomerDetailsModal";
 
 function MenuContent() {
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const tableParam = searchParams.get("table");
 
   // Granular selectors so MenuContent only re-renders when relevant customer info changes
@@ -146,7 +144,7 @@ function MenuContent() {
 
         <button
           onClick={() => setIsCustomerModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cafe-100 hover:bg-cafe-200 text-cafe-800 text-xs font-bold border border-cafe-300 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cafe-100 hover:bg-cafe-200 text-cafe-800 text-xs font-bold border border-cafe-300 transition-colors cursor-pointer"
         >
           <Edit2 className="w-3.5 h-3.5 text-cafe-600" />
           <span>{mobile ? "Edit Info" : "Add Mobile"}</span>
@@ -192,7 +190,7 @@ function MenuContent() {
               setBestsellerOnly(false);
               setSelectedCategory("All");
             }}
-            className="px-4 py-2 bg-cafe-900 text-white rounded-xl text-xs font-bold hover:bg-cafe-800"
+            className="px-4 py-2 bg-cafe-900 text-white rounded-xl text-xs font-bold hover:bg-cafe-800 cursor-pointer"
           >
             Reset Filters
           </button>

@@ -1,15 +1,11 @@
-"use client";
-
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   CheckCircle2,
-  ShieldCheck,
   User,
   Phone,
   MapPin,
-  Clock,
   MessageSquare,
   AlertCircle,
   Receipt,
@@ -23,7 +19,7 @@ import { buildOrder } from "@/lib/order-generator";
 import { normalizeIndianMobile } from "@/lib/whatsapp";
 
 export default function CheckoutPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { items, getSubtotal, getTaxAmount, getGrandTotal, taxPercent, clearCart, setLastOrder } =
     useCartStore();
   const { tableId, name, mobile, notes, setName, setMobile, setTableId, setNotes } =
@@ -88,7 +84,7 @@ export default function CheckoutPage() {
     clearCart();
 
     // Route to confirmation / digital bill screen
-    router.push("/order-success");
+    navigate("/order-success");
   };
 
   if (items.length === 0) {
@@ -96,8 +92,8 @@ export default function CheckoutPage() {
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
         <h2 className="text-xl font-bold text-cafe-950">No items to checkout</h2>
         <button
-          onClick={() => router.push(tableId ? `/menu?table=${tableId}` : "/menu")}
-          className="px-6 py-2.5 bg-cafe-900 text-white rounded-xl text-xs font-bold"
+          onClick={() => navigate(tableId ? `/menu?table=${tableId}` : "/menu")}
+          className="px-6 py-2.5 bg-cafe-900 text-white rounded-xl text-xs font-bold cursor-pointer"
         >
           Return to Menu
         </button>
@@ -109,8 +105,8 @@ export default function CheckoutPage() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
       {/* Back to Cart link */}
       <button
-        onClick={() => router.push("/cart")}
-        className="flex items-center gap-1.5 text-xs font-bold text-cafe-700 hover:text-cafe-950"
+        onClick={() => navigate("/cart")}
+        className="flex items-center gap-1.5 text-xs font-bold text-cafe-700 hover:text-cafe-950 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Cart</span>
@@ -276,7 +272,7 @@ export default function CheckoutPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-base shadow-elevated flex items-center justify-center gap-2 transition-transform active:scale-[0.99]"
+          className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-base shadow-elevated flex items-center justify-center gap-2 transition-transform active:scale-[0.99] cursor-pointer"
         >
           <CheckCircle2 className="w-5 h-5" />
           <span>{isSubmitting ? "Generating Order..." : "Confirm & Place Order"}</span>

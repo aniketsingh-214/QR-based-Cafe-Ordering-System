@@ -1,6 +1,6 @@
-# The Roast & Toast Cafe — QR-based Table Ordering System (Phase 1)
+# The Roast & Toast Cafe — QR-based Table Ordering System
 
-A frontend-only, contactless QR-based cafe ordering web application built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and **Zustand**. Designed for mobile responsiveness, seamless table-side ordering, instant WhatsApp kitchen notifications, and digital receipts without any backend or database requirements.
+A frontend-only, contactless QR-based cafe ordering web application built with **Vite**, **React 18**, **TypeScript**, **Tailwind CSS**, and **Zustand**. Designed for mobile responsiveness, seamless table-side ordering, instant WhatsApp kitchen notifications, and digital receipts without any backend or database requirements.
 
 ---
 
@@ -24,9 +24,11 @@ A frontend-only, contactless QR-based cafe ordering web application built with *
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Build Tool & Dev Server**: Vite
+- **Framework**: React 18 + React Router 6
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS with custom warm cafe palette
+- **Global Styles**: `src/globals.css` (custom CSS variables, scrollbars, print styles)
 - **Icons**: Lucide React
 - **State Management**: Zustand with `localStorage` persistence
 - **QR Generation**: `qrcode` (dynamic table tent cards & QR URLs)
@@ -38,26 +40,42 @@ A frontend-only, contactless QR-based cafe ordering web application built with *
 ## 📦 Project Structure
 
 ```
-├── public/
+├── index.html                  # Vite root HTML entry
+├── vite.config.ts              # Vite configuration with @/ alias
+├── tailwind.config.ts          # Tailwind CSS theme configuration
+├── postcss.config.js           # PostCSS configuration
+├── tsconfig.json               # TypeScript configuration
+├── public/                     # Static assets (coffee.svg logo, etc.)
 ├── src/
-│   ├── app/
-│   │   ├── page.tsx            # Screen 01 & 02: Table identification & Customer details
-│   │   ├── menu/page.tsx       # Screen 03 & 04: Digital Menu browsing & search
-│   │   ├── cart/page.tsx       # Screen 05: Cart management & calculation
-│   │   ├── checkout/page.tsx   # Screen 06: Order review & placement
-│   │   ├── order-success/page.tsx # Screen 07 & 08: Digital bill & WhatsApp trigger
-│   │   ├── owner/qr-codes/page.tsx   # Owner-only QR Code & Tent Card Print Center (Basic-Auth protected)
-│   │   ├── layout.tsx          # Root mobile-first layout with Header & Bottom Cart Bar
-│   │   └── globals.css         # Styling & print receipt rules
+│   ├── main.tsx                # Application mounting entry point
+│   ├── App.tsx                 # React Router route definitions
+│   ├── globals.css             # Tailwind base & custom design styles
+│   ├── pages/
+│   │   ├── LandingPage.tsx     # Screen 01 & 02: Table identification & Customer details
+│   │   ├── MenuPage.tsx        # Screen 03 & 04: Digital Menu browsing & search
+│   │   ├── CartPage.tsx        # Screen 05: Cart management & calculation
+│   │   ├── CheckoutPage.tsx    # Screen 06: Order review & placement
+│   │   ├── OrderSuccessPage.tsx# Screen 07 & 08: Digital bill & WhatsApp trigger
+│   │   └── owner/
+│   │       └── QrCodesPage.tsx # Owner QR Code & Tent Card Print Center
 │   ├── components/
-│   │   ├── layout/Header.tsx
-│   │   ├── layout/BottomCartBar.tsx
-│   │   ├── menu/MenuCard.tsx
-│   │   ├── menu/MenuItemModal.tsx
-│   │   ├── menu/CategoryTabs.tsx
-│   │   ├── menu/SearchBar.tsx
-│   │   ├── customer/CustomerDetailsModal.tsx
-│   │   └── receipt/DigitalReceipt.tsx
+│   │   ├── common/
+│   │   │   └── ScrollToTop.tsx # Resets scroll position on navigation
+│   │   ├── layout/
+│   │   │   ├── Layout.tsx
+│   │   │   ├── Header.tsx
+│   │   │   └── BottomCartBar.tsx
+│   │   ├── menu/
+│   │   │   ├── MenuCard.tsx
+│   │   │   ├── MenuItemModal.tsx
+│   │   │   ├── CategoryTabs.tsx
+│   │   │   └── SearchBar.tsx
+│   │   ├── customer/
+│   │   │   └── CustomerDetailsModal.tsx
+│   │   ├── receipt/
+│   │   │   └── DigitalReceipt.tsx
+│   │   └── ui/
+│   │       └── Image.tsx       # Responsive image component
 │   ├── data/
 │   │   ├── menu.ts             # Complete menu across 7 categories
 │   │   ├── categories.ts       # Coffee, Tea, Cold Drinks, Snacks, Sandwiches, Main Course, Desserts
@@ -89,7 +107,7 @@ npm install
 ```
 
 ### 2. Configure Environment Variables
-Copy `.env.example` to `.env.local` to enable the owner panel:
+Copy `.env.example` to `.env.local`:
 ```bash
 cp .env.example .env.local
 ```
@@ -99,42 +117,8 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## 🧪 Testing Scenarios
-
-1. **Table-Specific QR Simulation**:
-   - Visit [http://localhost:3000/?table=T01](http://localhost:3000/?table=T01) or [http://localhost:3000/menu?table=T04](http://localhost:3000/menu?table=T04)
-   - Notice that the table ID is automatically detected and locked.
-
-2. **Customer Information & Validation**:
-   - Enter your Indian mobile number (`9876543210`) and optional name.
-   - Validation ensures a valid 10-digit number before order placement.
-
-3. **Menu Browsing & Search**:
-   - Filter by categories: **Coffee**, **Tea**, **Cold Beverages**, **Snacks**, **Sandwiches**, **Main Course**, **Desserts**.
-   - Use the live search bar or toggles for **Pure Veg 🌿** and **Bestsellers ⭐**.
-   - Tap any card to view detailed notes, preparation time, and add custom instructions.
-
-4. **Verify Prompt Example Calculations**:
-   - Add **2 × Classic Cappuccino** (₹180 ea = ₹360)
-   - Add **1 × Gourmet Veg Club Sandwich** (₹150)
-   - Add **1 × Crispy Peri-Peri French Fries** (₹120)
-   - Check Cart:
-     - Subtotal: **₹630.00**
-     - Taxes (5% GST): **₹31.50**
-     - Grand Total: **₹661.50**
-
-5. **Place Order & WhatsApp Trigger**:
-   - Proceed to Checkout and tap **Confirm & Place Order**.
-   - Order ID is generated in format: `ORD-20261119-001`.
-   - Tap **Send Order to Kitchen on WhatsApp**: Direct link opens WhatsApp to the kitchen number (`+919079629797`) with pre-filled order.
-   - Tap **Send Bill to My WhatsApp** to send receipt text to customer's own number.
-   - Tap **Print / Save PDF** to trigger clean thermal receipt printing.
-
-6. **QR Code Generator & Table Stand Center**:
-   - Visit [http://localhost:3000/owner/qr-codes](http://localhost:3000/owner/qr-codes)
-   - Enter owner credentials from `.env.local` (`owner` / `change-me-to-a-long-random-password`).
-   - View, download, or print table tent cards for all tables (T01 - T12) or create custom tables.
+### 4. Build for Production
+```bash
+npm run build
+```
+This produces optimized production assets in `dist/`.

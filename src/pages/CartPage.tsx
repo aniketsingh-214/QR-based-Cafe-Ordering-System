@@ -1,8 +1,6 @@
-"use client";
-
 import React, { useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Image from "@/components/ui/Image";
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingBag,
   Trash2,
@@ -12,12 +10,8 @@ import {
   ArrowLeft,
   UtensilsCrossed,
   Receipt,
-  User,
-  Phone,
-  MapPin,
   Edit2,
   MessageSquare,
-  ShieldCheck,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { useCustomerStore } from "@/store/customer-store";
@@ -26,7 +20,7 @@ import { getTableById } from "@/data/tables";
 import CustomerDetailsModal from "@/components/customer/CustomerDetailsModal";
 
 export default function CartPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const {
     items,
     updateQuantity,
@@ -52,7 +46,7 @@ export default function CartPage() {
       setIsCustomerModalOpen(true);
       return;
     }
-    router.push("/checkout");
+    navigate("/checkout");
   };
 
   if (items.length === 0) {
@@ -66,8 +60,8 @@ export default function CartPage() {
           Looks like you haven&apos;t added any delicious items to your table order yet.
         </p>
         <button
-          onClick={() => router.push(tableId ? `/menu?table=${tableId}` : "/menu")}
-          className="px-6 py-3 bg-cafe-950 text-white rounded-2xl text-sm font-bold shadow-md hover:bg-cafe-900 inline-flex items-center gap-2"
+          onClick={() => navigate(tableId ? `/menu?table=${tableId}` : "/menu")}
+          className="px-6 py-3 bg-cafe-950 text-white rounded-2xl text-sm font-bold shadow-md hover:bg-cafe-900 inline-flex items-center gap-2 cursor-pointer"
         >
           <UtensilsCrossed className="w-4 h-4 text-amber-300" />
           <span>Browse Cafe Menu</span>
@@ -81,8 +75,8 @@ export default function CartPage() {
       {/* Top Navigation */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => router.push(tableId ? `/menu?table=${tableId}` : "/menu")}
-          className="flex items-center gap-1.5 text-xs font-bold text-cafe-700 hover:text-cafe-950"
+          onClick={() => navigate(tableId ? `/menu?table=${tableId}` : "/menu")}
+          className="flex items-center gap-1.5 text-xs font-bold text-cafe-700 hover:text-cafe-950 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Menu</span>
@@ -90,7 +84,7 @@ export default function CartPage() {
 
         <button
           onClick={clearCart}
-          className="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1"
+          className="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer"
         >
           <Trash2 className="w-3.5 h-3.5" />
           <span>Clear Cart</span>
@@ -126,7 +120,7 @@ export default function CartPage() {
 
         <button
           onClick={() => setIsCustomerModalOpen(true)}
-          className="p-2 rounded-xl bg-cafe-100 hover:bg-cafe-200 text-cafe-700 transition-colors"
+          className="p-2 rounded-xl bg-cafe-100 hover:bg-cafe-200 text-cafe-700 transition-colors cursor-pointer"
           title="Edit Details"
         >
           <Edit2 className="w-4 h-4" />
@@ -186,7 +180,7 @@ export default function CartPage() {
                         onClick={() =>
                           updateQuantity(cartItem.item.id, cartItem.quantity - 1)
                         }
-                        className="p-1 rounded text-cafe-700 hover:bg-cafe-200 active:scale-90 transition-transform"
+                        className="p-1 rounded text-cafe-700 hover:bg-cafe-200 active:scale-90 transition-transform cursor-pointer"
                       >
                         <Minus className="w-3.5 h-3.5 text-cafe-700" />
                       </button>
@@ -197,7 +191,7 @@ export default function CartPage() {
                         onClick={() =>
                           updateQuantity(cartItem.item.id, cartItem.quantity + 1)
                         }
-                        className="p-1 rounded text-cafe-700 hover:bg-cafe-200 active:scale-90 transition-transform"
+                        className="p-1 rounded text-cafe-700 hover:bg-cafe-200 active:scale-90 transition-transform cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5 text-cafe-700" />
                       </button>
@@ -205,7 +199,7 @@ export default function CartPage() {
 
                     <button
                       onClick={() => removeItem(cartItem.item.id)}
-                      className="text-cafe-400 hover:text-red-600 p-1 rounded-lg"
+                      className="text-cafe-400 hover:text-red-600 p-1 rounded-lg cursor-pointer"
                       title="Remove Item"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -261,7 +255,7 @@ export default function CartPage() {
       {/* Checkout Action Button */}
       <button
         onClick={handleProceedToCheckout}
-        className="w-full py-4 px-5 rounded-2xl bg-cafe-950 hover:bg-cafe-900 text-white font-extrabold text-base shadow-elevated flex items-center justify-between transition-transform active:scale-[0.99] group"
+        className="w-full py-4 px-5 rounded-2xl bg-cafe-950 hover:bg-cafe-900 text-white font-extrabold text-base shadow-elevated flex items-center justify-between transition-transform active:scale-[0.99] group cursor-pointer"
       >
         <div className="text-left">
           <p className="text-[11px] text-cafe-300 font-normal">Ready to order</p>

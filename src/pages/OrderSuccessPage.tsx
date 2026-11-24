@@ -1,16 +1,12 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
 import {
   CheckCircle2,
   Share2,
   Printer,
   MessageCircle,
-  ArrowRight,
   UtensilsCrossed,
-  Sparkles,
   Eye,
   ChevronDown,
   ChevronUp,
@@ -28,7 +24,7 @@ import { printBill } from "@/lib/bill-generator";
 import DigitalReceipt from "@/components/receipt/DigitalReceipt";
 
 export default function OrderSuccessPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { lastOrder, orderHistory } = useCartStore();
   const { tableId } = useCustomerStore();
 
@@ -60,8 +56,8 @@ export default function OrderSuccessPage() {
           You haven&apos;t placed an order yet or browser storage was cleared.
         </p>
         <button
-          onClick={() => router.push(tableId ? `/menu?table=${tableId}` : "/menu")}
-          className="px-6 py-2.5 bg-cafe-900 text-white rounded-xl text-xs font-bold"
+          onClick={() => navigate(tableId ? `/menu?table=${tableId}` : "/menu")}
+          className="px-6 py-2.5 bg-cafe-900 text-white rounded-xl text-xs font-bold cursor-pointer"
         >
           Go to Menu
         </button>
@@ -127,7 +123,7 @@ export default function OrderSuccessPage() {
         <div className="pt-2 text-left">
           <button
             onClick={() => setShowMessagePreview(!showMessagePreview)}
-            className="text-xs text-cafe-600 hover:text-cafe-900 font-medium flex items-center gap-1 mx-auto"
+            className="text-xs text-cafe-600 hover:text-cafe-900 font-medium flex items-center gap-1 mx-auto cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5 text-cafe-500" />
             <span>{showMessagePreview ? "Hide" : "Preview"} Pre-filled WhatsApp Text</span>
@@ -162,7 +158,7 @@ export default function OrderSuccessPage() {
         {/* Print / Save PDF Bill */}
         <button
           onClick={printBill}
-          className="p-3.5 bg-white hover:bg-cafe-50 rounded-2xl border border-cafe-300 font-bold text-xs sm:text-sm text-cafe-900 shadow-2xs flex items-center justify-center gap-2 transition-colors active:scale-95"
+          className="p-3.5 bg-white hover:bg-cafe-50 rounded-2xl border border-cafe-300 font-bold text-xs sm:text-sm text-cafe-900 shadow-2xs flex items-center justify-center gap-2 transition-colors active:scale-95 cursor-pointer"
         >
           <Printer className="w-4 h-4 text-cafe-800" />
           <span>Print / Save PDF</span>
@@ -180,8 +176,8 @@ export default function OrderSuccessPage() {
       {/* Return to Menu Button */}
       <div className="text-center pt-2 pb-6 no-print">
         <button
-          onClick={() => router.push(`/menu?table=${order.tableId}`)}
-          className="px-6 py-3 bg-cafe-950 text-white rounded-2xl text-xs sm:text-sm font-bold hover:bg-cafe-900 inline-flex items-center gap-2 shadow-sm"
+          onClick={() => navigate(`/menu?table=${order.tableId}`)}
+          className="px-6 py-3 bg-cafe-950 text-white rounded-2xl text-xs sm:text-sm font-bold hover:bg-cafe-900 inline-flex items-center gap-2 shadow-sm cursor-pointer"
         >
           <UtensilsCrossed className="w-4 h-4 text-amber-300" />
           <span>Order More Food for Table {order.tableId}</span>

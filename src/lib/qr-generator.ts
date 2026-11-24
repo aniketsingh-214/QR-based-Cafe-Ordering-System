@@ -2,11 +2,11 @@ import QRCode from "qrcode";
 
 /**
  * Canonical public origin printed into every QR code.
- * Prefer NEXT_PUBLIC_SITE_URL (set in production) so QR codes generated while the owner is on a
+ * Prefer VITE_SITE_URL (set in production) so QR codes generated while the owner is on a
  * preview/localhost URL never encode the wrong host.
  */
 export function getSiteOrigin(): string {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
+  const configured = import.meta.env.VITE_SITE_URL?.trim().replace(/\/+$/, "");
   if (configured) return configured;
   return typeof window !== "undefined" ? window.location.origin : "https://cafe.com";
 }
